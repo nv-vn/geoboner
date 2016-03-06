@@ -1,0 +1,17 @@
+Name: geoboner
+Version: 1.0
+OCamlVersion: >= 4.02
+Synopsis: A Boner-Tracking Web App
+Authors: nv-vn <nv@cock.li>
+License: MIT
+
+OASISFormat: 0.4
+BuildTools: ocamlbuild
+Plugins: META (0.4), DevFiles (0.4)
+
+Executable "geoboner"
+  Path: src/
+  MainIs: main.ml
+  CompiledObject: best
+  Install: false
+  BuildDepends: lwt, opium, yojson, batteries, ppx_blob, gensqlite, gensqlite.ppx
