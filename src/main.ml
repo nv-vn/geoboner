@@ -1,3 +1,4 @@
+open Batteries
 open Opium.Std
 
 open UserData
@@ -9,13 +10,36 @@ let user_info = get "/user/:username" begin fun req ->
     `String json |> respond'
   end
 
+let nearby_boners = get "/near/:longitude/:latitude" begin fun req ->
+    let boner = create_boner ~longitude:(float_of_string @@ param req "longitude")
+                             ~latitude:(float_of_string @@ param req "latitude") in
+    let geo (user, boner) =
+      let open Yojson.Safe in
+      to_string @@
+        `Assoc ["type", `String "Feature";
+                "geometry", `Assoc [
+                  "type", `String "Point";
+                  "coordinates", `List [`Float boner.longitude;
+                                        `Float boner.latitude];
+                  "time", `Int (int_of_float boner.time)
+                ];
+                "properties", `Assoc ["name", `String user]
+               ] in
+    let boners = Enum.map geo (Db.get_locs boner) in
+    let folder i obj buff = match i with
+      | 0 -> buff ^ obj
+      | _ -> buff ^ "," ^ obj in
+    `String (Enum.foldi folder "{\"data\": [" boners ^ "]}")|> respond'
+  end
+
 let new_user = post "/new/" begin fun req ->
     App.urlencoded_pairs_of_body req >>= fun params ->
     let post_param name = List.assoc name params |> List.hd in
     let firstname = post_param "firstname"
     and lastname  = post_param "lastname"
-    and username  = post_param "username" in
-    create_user ~firstname ~lastname ~username |> Db.new_user;
+    and username  = post_param "username"
+    and password  = post_param "password" in
+    (create_user ~firstname ~lastname ~username |> Db.new_user) password;
     `String [%blob "../static/user.html"] |> respond'
   end
 
@@ -23,11 +47,12 @@ let log_boner = post "/log/" begin fun req ->
     App.urlencoded_pairs_of_body req >>= fun params ->
     let post_param name = List.assoc name params |> List.hd in
     let username  = post_param "username"
+    and password  = post_param "password"
     and longitude = float_of_string @@ post_param "longitude"
     and latitude  = float_of_string @@ post_param "latitude" in
     let user = Db.get_user username in
     let boner = create_boner ~longitude ~latitude in
-    add_boner boner user |> Db.put_user;
+    (add_boner boner user |> Db.put_user) password;
     `String [%blob "../static/user.html"] |> respond'
   end
 
@@ -41,5 +66,6 @@ let app =
   |> user_info
   |> new_user
   |> log_boner
+  |> nearby_boners
 
 let () = App.run_command app

@@ -14,4 +14,4 @@ Executable "geoboner"
   MainIs: main.ml
   CompiledObject: best
   Install: false
-  BuildDepends: lwt, opium, yojson, batteries, ppx_blob, gensqlite, gensqlite.ppx
+  BuildDepends: lwt, opium, yojson, batteries, safepass, ppx_blob, gensqlite, gensqlite.ppx
