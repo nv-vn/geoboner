@@ -67,9 +67,8 @@ let log_boner = post "/log/" begin fun req ->
     and password  = post_param "password"
     and latitude  = float_of_string @@ post_param "latitude"
     and longitude = float_of_string @@ post_param "longitude" in
-    let user = Db.get_user username in
     let boner = create_boner ~latitude ~longitude in
-    (add_boner boner user |> Db.put_user) password;
+    Db.put_boner username boner password;
     redirect' (Uri.of_string "/")
   end
 
