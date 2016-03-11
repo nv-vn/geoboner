@@ -10,6 +10,18 @@ let user_info = get "/user/:username" begin fun req ->
     `String json |> respond'
   end
 
+let user_page = get "/u/:username" begin fun req ->
+    let username = param req "username" in
+    let user = Db.get_user username in
+    let page = Printf.sprintf [%blob "../static/user.html"]
+        user.username
+        user.username
+        user.firstname
+        user.lastname
+        (json_of_boners user.boners |> Yojson.Safe.to_string) in
+    `String page |> respond'
+  end
+
 let nearby_boners = get "/near/:latitude/:longitude" begin fun req ->
     let boner = create_boner ~latitude:(float_of_string @@ param req "latitude")
                              ~longitude:(float_of_string @@ param req "longitude") in
@@ -32,7 +44,7 @@ let nearby_boners = get "/near/:latitude/:longitude" begin fun req ->
     let folder i obj buff = match i with
       | 0 -> buff ^ obj
       | _ -> buff ^ "," ^ obj in
-    let preamble  = "{\"type\": \"FeatureCollection\",\"features\": ["
+    let preamble  = "{\"type\":\"FeatureCollection\",\"features\":["
     and postamble = "]}" in
     `String (Enum.foldi folder preamble boners ^ postamble)|> respond'
   end
@@ -45,7 +57,7 @@ let new_user = post "/new/" begin fun req ->
     and username  = post_param "username"
     and password  = post_param "password" in
     (create_user ~firstname ~lastname ~username |> Db.new_user) password;
-    `String [%blob "../static/user.html"] |> respond'
+    redirect' (Uri.of_string "/")
   end
 
 let log_boner = post "/log/" begin fun req ->
@@ -58,7 +70,7 @@ let log_boner = post "/log/" begin fun req ->
     let user = Db.get_user username in
     let boner = create_boner ~latitude ~longitude in
     (add_boner boner user |> Db.put_user) password;
-    `String [%blob "../static/user.html"] |> respond'
+    redirect' (Uri.of_string "/")
   end
 
 let index = get "/" begin fun req ->
@@ -69,6 +81,7 @@ let app =
   App.empty
   |> index
   |> user_info
+  |> user_page
   |> new_user
   |> log_boner
   |> nearby_boners

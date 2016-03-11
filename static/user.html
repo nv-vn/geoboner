@@ -1,9 +1,30 @@
 <!DOCTYPE html>
 <html>
-	<head>
-		<title>Geoboner</title>
-	</head>
-	<body>
-		<h1>Geoboner</h1>
-	</body>
+  <head>
+    <title>Geoboner - %s</title>
+  </head>
+  <body>
+    <h1>%s</h1>
+    <h2>%s %s</h2>
+    <table id="entries">
+      <tr>
+        <td>Latitude</td>
+        <td>Longitude</td>
+        <td>Time</td>
+      </tr>
+    </table>
+    <script>
+      var data = %s;
+      var table = document.getElementById("entries");
+      for (key in data) {
+        var row = table.insertRow(1);
+        var lat  = row.insertCell(0);
+        var long = row.insertCell(1);
+        var time = row.insertCell(2);
+        lat.innerHTML  = data[key].latitude;
+        long.innerHTML = data[key].longitude;
+        time.innerHTML = data[key].time;
+      }
+    </script>
+  </body>
 </html>
