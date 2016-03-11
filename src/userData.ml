@@ -1,17 +1,17 @@
 open Yojson.Safe
 
 type boner = {
-  longitude : float;
   latitude  : float;
+  longitude : float;
   time      : float
 }
 
-let create_boner ~longitude ~latitude =
-  {longitude; latitude; time = Unix.time ()}
+let create_boner ~latitude ~longitude =
+  {latitude; longitude; time = Unix.time ()}
 
-let json_of_boner {longitude; latitude; time} =
-  `Assoc ["longitude", `Float longitude;
-          "latitude",  `Float latitude;
+let json_of_boner {latitude; longitude; time} =
+  `Assoc ["latitude",  `Float latitude;
+          "longitude", `Float longitude;
           "time",      `Float time]
 
 let boner_of_json json =
@@ -22,10 +22,24 @@ let boner_of_json json =
   let float = function
     | `Float f -> f
     | _ -> 0.0 in
-  let longitude = json |> get_field "longitude" |> float
-  and latitude  = json |> get_field "latitude"  |> float
+  let latitude  = json |> get_field "latitude"  |> float
+  and longitude = json |> get_field "longitude" |> float
   and time      = json |> get_field "time"      |> float in
-  {(create_boner ~longitude ~latitude) with time}
+  {(create_boner ~latitude ~longitude) with time}
+
+let format_time t =
+  let open Unix in
+  let time = gmtime t in
+  let days = [| "Sunday"; "Monday"; "Tuesday"; "Wednesday"; "Thursday"; "Friday"; "Saturday" |]
+  and months = [| "January"; "February"; "March"; "April"; "May"; "June"; "July"; "August"; "September"; "October"; "November"; "December" |] in
+  Printf.sprintf "At %d:%d %s (GMT) on %s %s %d, %d\n"
+    (time.tm_hour mod 12)
+    time.tm_min
+    (if time.tm_hour > 12 then "PM" else "AM")
+    days.(time.tm_wday)
+    months.(time.tm_mon)
+    time.tm_mday
+    (time.tm_year + 1900)
 
 (** TODO: Profile picture, bio, linkedin contact *)
 type user = {

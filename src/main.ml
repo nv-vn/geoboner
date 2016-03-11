@@ -10,26 +10,31 @@ let user_info = get "/user/:username" begin fun req ->
     `String json |> respond'
   end
 
-let nearby_boners = get "/near/:longitude/:latitude" begin fun req ->
-    let boner = create_boner ~longitude:(float_of_string @@ param req "longitude")
-                             ~latitude:(float_of_string @@ param req "latitude") in
+let nearby_boners = get "/near/:latitude/:longitude" begin fun req ->
+    let boner = create_boner ~latitude:(float_of_string @@ param req "latitude")
+                             ~longitude:(float_of_string @@ param req "longitude") in
     let geo (user, boner) =
       let open Yojson.Safe in
       to_string @@
         `Assoc ["type", `String "Feature";
                 "geometry", `Assoc [
                   "type", `String "Point";
-                  "coordinates", `List [`Float boner.longitude;
+                  "coordinates", `List [`Float boner.longitude; (* geoJSON reverses these *)
                                         `Float boner.latitude];
                   "time", `Int (int_of_float boner.time)
                 ];
-                "properties", `Assoc ["name", `String user]
+                "properties", `Assoc [
+                  "name", `String user;
+                  "description", `String (format_time boner.time)
+                ]
                ] in
     let boners = Enum.map geo (Db.get_locs boner) in
     let folder i obj buff = match i with
       | 0 -> buff ^ obj
       | _ -> buff ^ "," ^ obj in
-    `String (Enum.foldi folder "{\"data\": [" boners ^ "]}")|> respond'
+    let preamble  = "{\"type\": \"FeatureCollection\",\"features\": ["
+    and postamble = "]}" in
+    `String (Enum.foldi folder preamble boners ^ postamble)|> respond'
   end
 
 let new_user = post "/new/" begin fun req ->
@@ -48,10 +53,10 @@ let log_boner = post "/log/" begin fun req ->
     let post_param name = List.assoc name params |> List.hd in
     let username  = post_param "username"
     and password  = post_param "password"
-    and longitude = float_of_string @@ post_param "longitude"
-    and latitude  = float_of_string @@ post_param "latitude" in
+    and latitude  = float_of_string @@ post_param "latitude"
+    and longitude = float_of_string @@ post_param "longitude" in
     let user = Db.get_user username in
-    let boner = create_boner ~longitude ~latitude in
+    let boner = create_boner ~latitude ~longitude in
     (add_boner boner user |> Db.put_user) password;
     `String [%blob "../static/user.html"] |> respond'
   end
