@@ -1,67 +1,67 @@
 <!DOCTYPE html>
 <html>
-	<head>
-		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-		<title>Geoboner</title>
-		<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js"></script>
-	</head>
-	<body>
-		<form action="/log/" method="POST">
-			<label>Username</label><input name="username" type="text">
-			<label>Password</label><input name="password" type="password">
-			<label>Latitude</label><input name="latitude" type="text">
-			<label>Longitude</label><input name="longitude" type="text">
-			<button type="submit">Done</button>
-		</form>
-		<form action="/new/" method="POST">
-			<label>Firstname</label><input name="firstname" type="text">
-			<label>Lastname</label><input name="lastname" type="text">
-			<label>Username</label><input name="username" type="text">
-			<label>Password</label><input name="password" type="password">
-			<button type="submit">Done</button>
-		</form>
-		<form>
-			<label>Latitude</label><input value="40.7127" id="latitude" type="text">
-			<label>Longitude</label><input value="-74.0059" id="longitude" type="text">
-			<div id="map" style="width: 500px; height: 380px"></div>
-			<button type="button" onclick="initFromForm()">Done</button>
-			<script>
-				function initMap(latitude, longitude) {
-					var infowindow = new google.maps.InfoWindow();
-					map = new google.maps.Map(document.getElementById('map'), {
-						center: new google.maps.LatLng(latitude, longitude),
-						zoom: 12
-					});
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <title>Geoboner</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js"></script>
+  </head>
+  <body>
+    <form action="/log/" method="POST">
+      <label>Username</label><input name="username" type="text">
+      <label>Password</label><input name="password" type="password">
+      <label>Latitude</label><input name="latitude" type="text">
+      <label>Longitude</label><input name="longitude" type="text">
+      <button type="submit">Done</button>
+    </form>
+    <form action="/new/" method="POST">
+      <label>Firstname</label><input name="firstname" type="text">
+      <label>Lastname</label><input name="lastname" type="text">
+      <label>Username</label><input name="username" type="text">
+      <label>Password</label><input name="password" type="password">
+      <button type="submit">Done</button>
+    </form>
+    <form>
+      <label>Latitude</label><input value="40.7127" id="latitude" type="text">
+      <label>Longitude</label><input value="-74.0059" id="longitude" type="text">
+      <div id="map" style="width: 500px; height: 380px"></div>
+      <button type="button" onclick="initFromForm()">Done</button>
+      <script>
+        function initMap(latitude, longitude) {
+          var infowindow = new google.maps.InfoWindow();
+          map = new google.maps.Map(document.getElementById('map'), {
+            center: new google.maps.LatLng(latitude, longitude),
+            zoom: 12
+          });
 
-					map.data.setStyle(function(feature) {
-						return {
-							icon: feature.getProperty('icon'),
-							title: feature.getProperty('title')
-						};
-					});
+          map.data.setStyle(function(feature) {
+            return {
+              icon: feature.getProperty('icon'),
+              title: feature.getProperty('title')
+            };
+          });
 
-					 map.data.addListener('click', function(event) {
-						infowindow.setContent(event.feature.getProperty('name')+"<br>"+event.feature.getProperty('description'));
-						infowindow.setPosition(event.latLng);
-						infowindow.setOptions({pixelOffset: new google.maps.Size(0,-34)});
-						infowindow.open(map);
-					 });
-					
-					$.getJSON("/near/" + latitude + "/" + longitude, function(data) {
-						map.data.addGeoJson(data);
-						return false;
-					});
-				}
-				function init() {
-					initMap(40.7127, -74.0059);
-				}
-				function initFromForm() {
-					var lat = $('#latitude').val();
-					var long = $('#longitude').val();
-					initMap(lat, long);
-				}
-			</script>
-			<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyALhe27wE26tRoxuen5xglqJ8FUQm_dG_A&callback=init" async defer></script>
-		</form>
-	</body>
+           map.data.addListener('click', function(event) {
+            infowindow.setContent(event.feature.getProperty('name')+"<br>"+event.feature.getProperty('description'));
+            infowindow.setPosition(event.latLng);
+            infowindow.setOptions({pixelOffset: new google.maps.Size(0,-34)});
+            infowindow.open(map);
+           });
+          
+          $.getJSON("/near/" + latitude + "/" + longitude, function(data) {
+            map.data.addGeoJson(data);
+            return false;
+          });
+        }
+        function init() {
+          initMap(40.7127, -74.0059);
+        }
+        function initFromForm() {
+          var lat = $('#latitude').val();
+          var long = $('#longitude').val();
+          initMap(lat, long);
+        }
+      </script>
+      <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyALhe27wE26tRoxuen5xglqJ8FUQm_dG_A&callback=init" async defer></script>
+    </form>
+  </body>
 </html>

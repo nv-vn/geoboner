@@ -17,7 +17,7 @@ It's a meme u dip
 * Batteries
 * Safepass
 * ppx_blob
-* Gensqlite (OPAM package may be broken)
+* Sqlite3 + Gensqlite (OPAM package may be broken)
 
 ### How do I use this?
 

@@ -15,6 +15,9 @@ module Raw = struct
   let (_, put_boner)  = [%gensqlite db "INSERT INTO boners (username, latitude, longitude, time) VALUES \
                                         (%s{username}, %s{latitude}, %s{longitude}, %s{time})"]
   let (_, get_locs)   = [%gensqlite db "SELECT @s{username}, @f{latitude}, @f{longitude}, @f{time} FROM boners"]
+
+  let (_, copy_older)  = [%gensqlite db "INSERT INTO archive SELECT * FROM boners WHERE time < %s{limit}"]
+  let (_, purge_older) = [%gensqlite db "DELETE FROM boners WHERE time < %s{limit}"]
 end
 
 let get_user username =
@@ -29,11 +32,18 @@ let get_user username =
                    longitude = float_of_string longitude;
                    time      = float_of_string time})}
 
+let archive ?(limit = Unix.time () -. (15. *. 60.)) () =
+  let limit = string_of_float limit in
+  Raw.copy_older  ~limit ();
+  Raw.purge_older ~limit ()
+
 let new_user {firstname; lastname; username} password =
+  archive ();
   let password = Bcrypt.string_of_hash (Bcrypt.hash password) in
   Raw.new_user ~password ~username ~lastname ~firstname ()
 
 let put_boner username boner password =
+  archive ();
   let latitude  = boner.latitude  |> string_of_float
   and longitude = boner.longitude |> string_of_float
   and time      = boner.time      |> string_of_float in
@@ -43,6 +53,7 @@ let put_boner username boner password =
   | [] | _::_ -> ()
 
 let get_locs ?(range = 40.0 (* km *)) from =
+  archive ();
   let mapper (username, latitude, longitude, time) =
     (username, {latitude  = float_of_string latitude;
                 longitude = float_of_string longitude;
@@ -59,4 +70,4 @@ let get_locs ?(range = 40.0 (* km *)) from =
     let a = (sin (dlat /. 2.) ** 2.) +. cos p1.latitude *. cos p2.latitude *. (sin (dlong /. 2.) ** 2.) in
     let c = 2. *. atan2 (sqrt a) (sqrt @@ 1. -. a) in
     c *. 6371. in
-  Enum.filter (fun (_, pos) -> ((now -. pos.time) /. 3600.) *. distance pos from <= range) locs
+  Enum.filter (fun (_, pos) -> distance pos from <= range) locs
