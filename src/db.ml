@@ -33,9 +33,11 @@ let get_user username =
                    time      = float_of_string time})}
 
 let archive ?(limit = Unix.time () -. (15. *. 60.)) () =
-  let limit = string_of_float limit in
-  Raw.copy_older  ~limit ();
-  Raw.purge_older ~limit ()
+  try
+    let limit = string_of_float limit in
+    Raw.copy_older  ~limit ();
+    Raw.purge_older ~limit ()
+  with _ -> ()
 
 let new_user {firstname; lastname; username} password =
   archive ();
@@ -59,7 +61,6 @@ let get_locs ?(range = 40.0 (* km *)) from =
                 longitude = float_of_string longitude;
                 time      = float_of_string time}) in
   let locs = Raw.get_locs () |> List.enum |> Enum.map mapper in
-  let now = Unix.time () in
   let distance p1 p2 =
     let rad deg = (deg /. 180.) *. 3.14159 in
     let lat1,  lat2  = rad p1.latitude,  rad p2.latitude

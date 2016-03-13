@@ -36,7 +36,7 @@ let nearby_boners = get "/near/:latitude/:longitude" begin fun req ->
                   "time", `Int (int_of_float boner.time)
                 ];
                 "properties", `Assoc [
-                  "name", `String user;
+                  "name", `String ("<a href=\"/u/" ^ user ^ "\">" ^ user ^ "</a>"); (* Link to user page *)
                   "description", `String (format_time boner.time)
                 ]
                ] in
