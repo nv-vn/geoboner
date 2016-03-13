@@ -36,7 +36,7 @@ let format_time t =
   let days = [| "Sunday"; "Monday"; "Tuesday"; "Wednesday"; "Thursday"; "Friday"; "Saturday" |]
   and months = [| "January"; "February"; "March"; "April"; "May"; "June"; "July"; "August"; "September"; "October"; "November"; "December" |] in
   Printf.sprintf "At %d:%s%d %s (GMT) on %s, %s %d, %d\n"
-    (time.tm_hour mod 12)
+    (let h = time.tm_hour mod 12 in if h = 0 then 12 else h)
     (if time.tm_min < 10 then "0" else "")
     time.tm_min
     (if time.tm_hour > 12 then "PM" else "AM")
