@@ -77,6 +77,7 @@ let index = get "/" begin fun req ->
   end
 
 let app =
+  let static = Middleware.static ~local_path:"./static" ~uri_prefix:"/static" in (* ./ because from exe directory *)
   App.empty
   |> index
   |> user_info
@@ -84,5 +85,6 @@ let app =
   |> new_user
   |> log_boner
   |> nearby_boners
+  |> middleware static
 
 let () = App.run_command app
