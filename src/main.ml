@@ -73,7 +73,9 @@ let log_boner = post "/log/" begin fun req ->
   end
 
 let index = get "/" begin fun req ->
-    `String [%blob "../static/index.html"] |> respond'
+    let page = Printf.sprintf [%blob "../static/index.html"]
+        [%blob "../mapsapi.key"] in
+    `String page |> respond'
   end
 
 let app =

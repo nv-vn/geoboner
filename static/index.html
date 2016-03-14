@@ -1,67 +1,108 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Geoboner</title>
-    <script src="/static/jquery.js"></script>
+    <link rel="stylesheet" href="/static/lib/bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/static/nav.css">
+    <link rel="stylesheet" href="/static/content.css">
   </head>
   <body>
-    <form action="/log/" method="POST">
-      <label>Username</label><input name="username" type="text">
-      <label>Password</label><input name="password" type="password">
-      <label>Latitude</label><input name="latitude" type="text">
-      <label>Longitude</label><input name="longitude" type="text">
-      <button type="submit">Done</button>
-    </form>
-    <form action="/new/" method="POST">
-      <label>Firstname</label><input name="firstname" type="text">
-      <label>Lastname</label><input name="lastname" type="text">
-      <label>Username</label><input name="username" type="text">
-      <label>Password</label><input name="password" type="password">
-      <button type="submit">Done</button>
-    </form>
-    <form>
-      <label>Latitude</label><input value="40.7127" id="latitude" type="text">
-      <label>Longitude</label><input value="-74.0059" id="longitude" type="text">
-      <div id="map" style="width: 500px; height: 380px"></div>
-      <button type="button" onclick="initFromForm()">Done</button>
-      <script>
-        function initMap(latitude, longitude) {
-          var infowindow = new google.maps.InfoWindow();
-          map = new google.maps.Map(document.getElementById('map'), {
-            center: new google.maps.LatLng(latitude, longitude),
-            zoom: 12
-          });
-
-          map.data.setStyle(function(feature) {
-            return {
-              icon: feature.getProperty('icon'),
-              title: feature.getProperty('title')
-            };
-          });
-
-           map.data.addListener('click', function(event) {
-            infowindow.setContent(event.feature.getProperty('name')+"<br>"+event.feature.getProperty('description'));
-            infowindow.setPosition(event.latLng);
-            infowindow.setOptions({pixelOffset: new google.maps.Size(0,-34)});
-            infowindow.open(map);
-           });
+    <nav class="navbar navbar-inverse navbar-fixed-top">
+      <div class="container">
+        <div class="navbar-header">
+          <a class="navbar-brand" href="#">Geoboner</a>
+        </div>
+        <div class="collapse navbar-collapse">
+          <ul class="nav navbar-nav">
+            <li class="active">
+              <a href="#">Home</a>
+            </li>
+            <li>
+              <a href="/about">About</a>
+            </li>
+          </ul>
+          <form id="user-search-form" class="navbar-form navbar-right">
+            <input id="user-search" class="form-control" placeholder="User..." type="text">
+            <script>
+              document.getElementById('user-search-form').addEventListener("keydown", function(e) {
+                if (e.keyCode == 13) {
+                  e.preventDefault();
+                  window.location.href = '/u/' + document.getElementById('user-search').value;
+                }
+              });
+            </script>
+          </form>
+        </div>
+      </div>
+    </nav>
+    <div class="container">
+      <h1>Geoboner</h1>
+      <form class="log-form" action="/log/" method="POST">
+        <h3 class="form-heading">Log boner</h3>
+        <input class="form-control top"    name="username"  placeholder="Username"  type="text">
+        <input class="form-control middle" name="password"  placeholder="Password"  type="password">
+        <input class="form-control middle" name="latitude"  placeholder="Latitude"  type="text">
+        <input class="form-control bottom" name="longitude" placeholder="Longitude" type="text">
+        <button class="btn btn-lg btn-primary btn-block" type="submit">Log it!</button>
+      </form>
+      <form class="new-form" action="/new/" method="POST">
+        <h3 class="form-heading">Sign up</h3>
+        <input class="form-control top"    name="firstname"  placeholder="First Name" type="text">
+        <input class="form-control middle" name="lastname"   placeholder="Last Name"  type="text">
+        <input class="form-control middle" name="username"   placeholder="Username"   type="text">
+        <input class="form-control bottom" name="password"   placeholder="Password"   type="password">
+        <button class="btn btn-lg btn-primary btn-block" type="submit">Go!</button>
+      </form>
+      <form>
+        <label>Latitude</label><input value="40.7127" id="latitude" type="text">
+        <label>Longitude</label><input value="-74.0059" id="longitude" type="text">
+        <div id="map" style="width: 500px; height: 380px"></div>
+        <button type="button" onclick="initFromForm()">Done</button>
+        <script>
+          function initMap(latitude, longitude) {
+            var infowindow = new google.maps.InfoWindow();
+            map = new google.maps.Map(document.getElementById('map'), {
+              center: new google.maps.LatLng(latitude, longitude),
+              zoom: 12
+            });
           
-          $.getJSON("/near/" + latitude + "/" + longitude, function(data) {
-            map.data.addGeoJson(data);
-            return false;
-          });
-        }
-        function init() {
-          initMap(40.7127, -74.0059);
-        }
-        function initFromForm() {
-          var lat = $('#latitude').val();
-          var long = $('#longitude').val();
-          initMap(lat, long);
-        }
-      </script>
-      <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyALhe27wE26tRoxuen5xglqJ8FUQm_dG_A&callback=init" async defer></script>
-    </form>
+            map.data.setStyle(function(feature) {
+              return {
+                icon: feature.getProperty('icon'),
+                title: feature.getProperty('title')
+              };
+            });
+
+            map.data.addListener('click', function(event) {
+              infowindow.setContent(event.feature.getProperty('name')+"<br>"+event.feature.getProperty('description'));
+              infowindow.setPosition(event.latLng);
+              infowindow.setOptions({pixelOffset: new google.maps.Size(0,-34)});
+              infowindow.open(map);
+            });
+
+            var request = new XMLHttpRequest();
+            request.open('GET', '/near/' + latitude + '/' + longitude, true);
+            request.onload = function() {
+              if (request.status >= 200 && request.status < 400) {
+                var data = JSON.parse(request.responseText);
+                map.data.addGeoJson(data);
+              }
+            };
+            request.send()
+          }
+          function init() {
+            initMap(40.7127, -74.0059);
+          }
+          function initFromForm() {
+            var lat = document.getElementById('latitude').value;
+            var long = document.getElementById('longitude').value;
+            initMap(lat, long);
+          }
+        </script>
+        <script src="https://maps.googleapis.com/maps/api/js?key=%s&callback=init" async defer></script>
+      </form>
   </body>
 </html>
