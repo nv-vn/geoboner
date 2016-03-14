@@ -33,11 +33,9 @@ let get_user username =
                    time      = float_of_string time})}
 
 let archive ?(limit = Unix.time () -. (15. *. 60.)) () =
-  try
-    let limit = string_of_float limit in
-    Raw.copy_older  ~limit ();
-    Raw.purge_older ~limit ()
-  with _ -> ()
+  let limit = string_of_float limit in
+  Raw.copy_older  ~limit ();
+  Raw.purge_older ~limit ()
 
 let new_user {firstname; lastname; username} password =
   archive ();
