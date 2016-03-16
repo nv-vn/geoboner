@@ -25,7 +25,7 @@
             </li>
           </ul>
           <form id="user-search-form" class="navbar-form navbar-right">
-            <input id="user-search" class="form-control" placeholder="User..." type="text">
+            <input id="user-search" class="form-control" placeholder="Search users" type="text">
             <script>
               document.getElementById('user-search-form').addEventListener("keydown", function(e) {
                 if (e.keyCode == 13) {
@@ -56,11 +56,12 @@
         <input class="form-control bottom" name="password"   placeholder="Password"   type="password">
         <button class="btn btn-lg btn-primary btn-block" type="submit">Go!</button>
       </form>
-      <form>
-        <label>Latitude</label><input value="40.7127" id="latitude" type="text">
-        <label>Longitude</label><input value="-74.0059" id="longitude" type="text">
+      <form class="map-form">
+        <input class="form-control top"    placeholder="Latitude"  id="latitude"  type="text">
+        <input class="form-control bottom" placeholder="Longitude" id="longitude" type="text">
         <div id="map" style="width: 500px; height: 380px"></div>
-        <button type="button" onclick="initFromForm()">Done</button>
+        <!--button type="button" onclick="initFromForm()">Done</button-->
+        <button class="btn btn-lg btn-primary btn-block" type="button" onclick="initFromForm()">Done</button>
         <script>
           function initMap(latitude, longitude) {
             var infowindow = new google.maps.InfoWindow();

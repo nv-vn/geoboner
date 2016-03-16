@@ -3,10 +3,21 @@
 }
 
 .log-form,
-.new-form {
+.new-form,
+.map-form {
   max-width: 330px;
   padding: 15px;
   margin: 0 auto;
+}
+
+.map-form {
+  max-width: 500px;
+}
+
+.map-form .form-control {
+  max-width: 330px;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .log-form .form-heading,
@@ -15,7 +26,8 @@
 }
 
 .log-form .form-control,
-.new-form .form-control {
+.new-form .form-control,
+.map-form .form-control {
   position: relative;
   height: auto;
   padding: 10px;
@@ -43,4 +55,10 @@
   margin-bottom: 10px;
   border-top-left-radius: 0;
   border-top-right-radius: 0;
+}
+
+#map {
+  margin-bottom: 10px;
+  margin-left: auto;
+  margin-right: auto;
 }
