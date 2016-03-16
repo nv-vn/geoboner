@@ -9,6 +9,8 @@ module Raw = struct
   let (_, get_user)   = [%gensqlite db "SELECT @s{firstname}, @s{lastname} FROM users WHERE username = %s{username}"]
   let (_, get_boners) = [%gensqlite db "SELECT @f{latitude}, @f{longitude}, @f{time} FROM boners WHERE \
                                         username = %s{username}"]
+  let (_, get_archive) = [%gensqlite db "SELECT @f{latitude}, @f{longitude}, @f{time} FROM archive WHERE \
+                                        username = %s{username}"]
   let (_, get_hash)   = [%gensqlite db "SELECT @s{password} FROM users WHERE username = %s{username}"]
   let (_, new_user)   = [%gensqlite db "INSERT INTO users (firstname, lastname, username, password) VALUES \
                                         (%s{firstname}, %s{lastname}, %s{username}, %s{password})"]
@@ -23,15 +25,14 @@ end
 let get_user username =
   let user = Raw.get_user ~username () in
   match user with
-  | [] -> create_user ~firstname:"error" ~lastname:"error" ~username
+  | [] -> None
   | (firstname, lastname)::_ ->
-    {(create_user ~firstname ~lastname ~username) with
-     boners = Raw.get_boners ~username ()
-              |> List.map (fun (latitude, longitude, time) ->
-                  {latitude  = float_of_string latitude;
-                   longitude = float_of_string longitude;
-                   time      = float_of_string time})}
-
+    Some {(create_user ~firstname ~lastname ~username) with
+          boners = Raw.get_boners ~username () @ Raw.get_archive ~username ()
+                   |> List.map (fun (latitude, longitude, time) ->
+                       {latitude  = float_of_string latitude;
+                        longitude = float_of_string longitude;
+                        time      = float_of_string time})}
 let archive ?(limit = Unix.time () -. (15. *. 60.)) () =
   let limit = string_of_float limit in
   Raw.copy_older  ~limit ();

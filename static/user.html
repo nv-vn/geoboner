@@ -1,30 +1,67 @@
 <!DOCTYPE html>
 <html>
   <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Geoboner - %s</title>
+    <link rel="stylesheet" href="/static/lib/bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/static/nav.css">
+    <link rel="stylesheet" href="/static/content.css">
   </head>
   <body>
-    <h1>%s</h1>
-    <h2>%s %s</h2>
-    <table id="entries">
-      <tr>
-        <td>Latitude</td>
-        <td>Longitude</td>
-        <td>Time</td>
-      </tr>
-    </table>
-    <script>
-      var data = %s;
-      var table = document.getElementById("entries");
-      for (key in data) {
-        var row = table.insertRow(1);
-        var lat  = row.insertCell(0);
-        var long = row.insertCell(1);
-        var time = row.insertCell(2);
-        lat.innerHTML  = data[key].latitude;
-        long.innerHTML = data[key].longitude;
-        time.innerHTML = data[key].time;
-      }
-    </script>
+    <nav class="navbar navbar-inverse navbar-fixed-top">
+      <div class="container">
+        <div class="navbar-header">
+          <a class="navbar-brand" href="/">Geoboner</a>
+        </div>
+        <div class="collapse navbar-collapse">
+          <ul class="nav navbar-nav">
+            <li>
+              <a href="/">Home</a>
+            </li>
+            <li>
+              <a href="/about">About</a>
+            </li>
+          </ul>
+          <form id="user-search-form" class="navbar-form navbar-right">
+            <input id="user-search" class="form-control" placeholder="Search users" type="text">
+            <script>
+              document.getElementById('user-search-form').addEventListener("keydown", function(e) {
+                if (e.keyCode == 13) {
+                  e.preventDefault();
+                  window.location.href = '/u/' + document.getElementById('user-search').value;
+                }
+              });
+            </script>
+          </form>
+        </div>
+      </div>
+    </nav>
+    <div class="container">
+      <h1>Geoboner</h1>
+      <h1>%s</h1>
+      <h2>%s %s</h2>
+      <table class="table" id="entries">
+        <tr>
+          <td>Latitude</td>
+          <td>Longitude</td>
+          <td>Time</td>
+        </tr>
+      </table>
+      <script>
+        var data = %s;
+        var table = document.getElementById("entries");
+        for (key in data) {
+          var row = table.insertRow(1);
+          var lat  = row.insertCell(0);
+          var long = row.insertCell(1);
+          var time = row.insertCell(2);
+          lat.innerHTML  = data[key].latitude;
+          long.innerHTML = data[key].longitude;
+          time.innerHTML = data[key].time;
+        }
+      </script>
+    </div>
   </body>
 </html>

@@ -5,21 +5,25 @@ open UserData
 
 let user_info = get "/user/:username" begin fun req ->
     let username = param req "username" in
-    let user = Db.get_user username in
-    let json = json_of_user user |> Yojson.Safe.to_string in
-    `String json |> respond'
+    match Db.get_user username with
+    | None -> `String "{\"error\": true}" |> respond'
+    | Some user ->
+      let json = json_of_user user |> Yojson.Safe.to_string in
+      `String json |> respond'
   end
 
 let user_page = get "/u/:username" begin fun req ->
     let username = param req "username" in
-    let user = Db.get_user username in
-    let page = Printf.sprintf [%blob "../static/user.html"]
-        user.username
-        user.username
-        user.firstname
-        user.lastname
-        (json_of_boners user.boners |> Yojson.Safe.to_string) in
-    `String page |> respond'
+    match Db.get_user username with
+    | None -> redirect' (Uri.of_string "/")
+    | Some user ->
+      let page = Printf.sprintf [%blob "../static/user.html"]
+          user.username
+          user.username
+          user.firstname
+          user.lastname
+          (json_of_boners' user.boners |> Yojson.Safe.to_string) in
+      `String page |> respond'
   end
 
 let nearby_boners = get "/near/:latitude/:longitude" begin fun req ->
