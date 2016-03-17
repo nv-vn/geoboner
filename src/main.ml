@@ -76,6 +76,10 @@ let log_boner = post "/log/" begin fun req ->
     redirect' (Uri.of_string "/")
   end
 
+let about = get "/about" begin fun req ->
+    `String [%blob "../static/about.html"] |> respond'
+  end
+
 let index = get "/" begin fun req ->
     let page = Printf.sprintf [%blob "../static/index.html"]
         [%blob "../mapsapi.key"] in
@@ -86,6 +90,7 @@ let app =
   let static = Middleware.static ~local_path:"./static" ~uri_prefix:"/static" in (* ./ because from exe directory *)
   App.empty
   |> index
+  |> about
   |> user_info
   |> user_page
   |> new_user

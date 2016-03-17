@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>About Geoboner</title>
+    <link rel="stylesheet" href="/static/lib/bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/static/nav.css">
+    <link rel="stylesheet" href="/static/content.css">
+  </head>
+  <body>
+    <nav class="navbar navbar-inverse navbar-fixed-top">
+      <div class="container">
+        <div class="navbar-header">
+          <a class="navbar-brand" href="/">Geoboner</a>
+        </div>
+        <div class="collapse navbar-collapse">
+          <ul class="nav navbar-nav">
+            <li>
+              <a href="/">Home</a>
+            </li>
+            <li class="active">
+              <a href="#">About</a>
+            </li>
+          </ul>
+          <form id="user-search-form" class="navbar-form navbar-right">
+            <input id="user-search" class="form-control" placeholder="Search users" type="text">
+            <script>
+              document.getElementById('user-search-form').addEventListener("keydown", function(e) {
+                if (e.keyCode == 13) {
+                  e.preventDefault();
+                  window.location.href = '/u/' + document.getElementById('user-search').value;
+                }
+              });
+            </script>
+          </form>
+        </div>
+      </div>
+    </nav>
+    <div class="container">
+      <h1>Geoboner</h1>
+      <h2>About Geoboner</h2>
+      <p>Geoboner is a platform for hosting and sharing information about your boners. You can share location for each new boner, or search recent and nearby boners.</p>
+      <p>Geoboner's backend is implemented in OCaml (using the Opium library for the web server) and is licensed under the GNU General Public License (Version 3).</p>
+      <p>Inspiration for Geoboner comes from <a href="https://i.imgur.com/IFdssi1.png">this post</a> on /g/.</p>
+      <p>You can find the source code and project page on <a href="https://github.com/nv-vn/geoboner">Github</a>. Feel free to file bugs, request improvements, or contribute changes through a pull request.</p>
+    </div>
+  </body>
+</html>
