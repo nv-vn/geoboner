@@ -48,20 +48,8 @@
           <td>Longitude</td>
           <td>Time</td>
         </tr>
+        %s
       </table>
-      <script>
-        var data = %s;
-        var table = document.getElementById("entries");
-        for (key in data) {
-          var row = table.insertRow(1);
-          var lat  = row.insertCell(0);
-          var long = row.insertCell(1);
-          var time = row.insertCell(2);
-          lat.innerHTML  = data[key].latitude;
-          long.innerHTML = data[key].longitude;
-          time.innerHTML = data[key].time;
-        }
-      </script>
     </div>
   </body>
 </html>

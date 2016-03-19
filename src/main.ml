@@ -14,6 +14,10 @@ let user_info = get "/user/:username" begin fun req ->
 
 let user_page = get "/u/:username" begin fun req ->
     let username = param req "username" in
+    let row_of_boner boner =
+      "<tr><td>"  ^ string_of_float boner.latitude ^
+      "</td><td>" ^ string_of_float boner.longitude ^
+      "</td><td>" ^ format_time boner.time  ^ "</td></tr>" in
     match Db.get_user username with
     | None -> redirect' (Uri.of_string "/")
     | Some user ->
@@ -22,7 +26,7 @@ let user_page = get "/u/:username" begin fun req ->
           user.username
           user.firstname
           user.lastname
-          (json_of_boners' user.boners |> Yojson.Safe.to_string) in
+          (user.boners |> List.map row_of_boner |> String.concat "") in
       `String page |> respond'
   end
 
