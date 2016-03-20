@@ -32,14 +32,6 @@ let json_of_boner {latitude; longitude; time} =
 let json_of_boners boners =
   `List (List.map json_of_boner boners)
 
-let json_of_boner' {latitude; longitude; time} =
-  `Assoc ["latitude",  `Float latitude;
-          "longitude", `Float longitude;
-          "time",      `String (format_time time)]
-
-let json_of_boners' boners =
-  `List (List.map json_of_boner' boners)
-
 let boner_of_json json =
   let rec get_field target = function
     | `Assoc (x::xs) when fst x = target -> snd x
